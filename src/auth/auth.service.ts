@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { SignInLocalResponseDto } from './dto/signInlocal.response.dto';
 import { JwtService } from '@nestjs/jwt';
-import { Sign } from 'crypto';
 
 //AuthService는 사용자를 검색하고 비밀번호를 검증하는 역할을 한다.
 @Injectable()
@@ -22,7 +21,7 @@ export class AuthService {
     return await this.usersService.createUser(email, password);
   }
 
-  //사용자 이메일과 비밀번호를 검증하는 메서드 - 로그인 메서드
+  //사용자 이메일과 비밀번호를 검증하는 메서드 - 회원가입 과정
   async validateUser(
     email: string,
     password: string,
@@ -35,10 +34,11 @@ export class AuthService {
     return null;
   }
 
-  async login(user: SignInLocalResponseDto): Promise<{ access_token: string }> {
+  createAccessToken(user: SignInLocalResponseDto): { accessToken: string } {
+    //반환할 것은 accessToken + 사용자 정보
     const payload = { userId: user.id, email: user.email };
     return {
-      access_token: await this.jwtService.sign(payload),
+      accessToken: this.jwtService.sign(payload), //jwtService.sign()은 동기메서드
     };
   }
 }
