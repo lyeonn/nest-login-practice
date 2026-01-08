@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { SignInLocalResponseDto } from './dto/signInlocal.response.dto';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 
 //AuthService는 사용자를 검색하고 비밀번호를 검증하는 역할을 한다.
 @Injectable()
@@ -18,17 +19,19 @@ export class AuthService {
       throw new Error('해당 이메일은 이미 회원가입이 되어있습니다.');
     }
 
-    return await this.usersService.createUser(email, password);
+    // 비밀번호 해싱
+    const hashedPassword = await bcrypt.hash(password, 10);
+    return await this.usersService.createUser(email, hashedPassword);
   }
 
-  //사용자 이메일과 비밀번호를 검증하는 메서드 - 회원가입 과정
+  //사용자 이메일과 비밀번호를 검증하는 메서드 - 로그인 과정
   async validateUser(
     email: string,
     password: string,
   ): Promise<SignInLocalResponseDto | null> {
     const user = await this.usersService.findOneByEmail(email);
 
-    if (user && user.password === password) {
+    if (user && (await bcrypt.compare(password, user.password))) {
       return { email: user.email, id: user.id };
     }
     return null;

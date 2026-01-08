@@ -9,7 +9,7 @@ export class UsersService {
   async findOneByEmail(email: string) {
     return await this.prisma.user.findUnique({
       where: { email },
-      select: { id: true, email: true },
+      select: { id: true, email: true, password: true },
     });
   }
 
