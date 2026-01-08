@@ -17,7 +17,7 @@ export class AuthController {
   //로그인
   @UseGuards(AuthGuard('local'))
   @Post('signin')
-  async signIn(@Request() req: { user: SignInLocalResponseDto }) {
+  signIn(@Request() req: { user: SignInLocalResponseDto }) {
     //왜 Request로 할까? Passport가 request에 user를 담아주기 때문
     return this.authService.createAccessToken(req.user);
   }
